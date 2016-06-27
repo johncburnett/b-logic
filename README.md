@@ -8,6 +8,7 @@ At the moment, this code parses arithmetic expressions into an AST and then eval
 $ cd src
 $ make
 $ ./calc
+> (2 * 7) + (3  * 2)   # type some math
 ```
 
 ### Dependencies
