@@ -23,7 +23,7 @@ newast(int nodetype, struct ast *l, struct ast *r) {
 
 
 struct ast *
-newnum(double d) {
+newnum(int d) {
     struct numval *a = malloc(sizeof(struct numval));
 
     if(!a) {
@@ -37,16 +37,15 @@ newnum(double d) {
 }
 
 
-double
+int
 eval(struct ast *a) {
-    double v; /* calculated value of this subtree */
+    int v; /* calculated value of this subtree */
 
     switch(a->nodetype) {
         case 'K': v = ((struct numval *)a)->number; break;
-        case '+': v = eval(a->l) + eval(a->r); break;
-        case '-': v = eval(a->l) - eval(a->r); break;
-        case '*': v = eval(a->l) * eval(a->r); break;
-        case '/': v = eval(a->l) / eval(a->r); break;
+        case '+': v = eval(a->l) | eval(a->r); break;
+        case '*': v = eval(a->l) & eval(a->r); break;
+        case '^': v = eval(a->l) ^ eval(a->r); break;
         case '|': v = eval(a->l); if(v < 0) v = -v; break;
         case 'M': v = -eval(a->l); break;
         default: printf("internal error: bad node %c\n", a->nodetype);
@@ -62,9 +61,8 @@ treefree(struct ast *a) {
 
         /* two subtrees */
         case '+':
-        case '-':
         case '*':
-        case '/':
+        case '^':
             treefree(a->r);
 
         /* one subtree */

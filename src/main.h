@@ -18,15 +18,15 @@ struct ast {
 
 struct numval {
     int nodetype; /* type K for constant */
-    double number;
+    int number;
 };
 
 /* build an AST */
 struct ast *newast(int nodetype, struct ast *l, struct ast *r);
-struct ast *newnum(double d);
+struct ast *newnum(int d);
 
 /* evaluate an AST */
-double eval(struct ast *);
+int eval(struct ast *);
 
 /* delete and free an AST */
 void treefree(struct ast *);

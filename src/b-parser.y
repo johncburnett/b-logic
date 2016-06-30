@@ -8,7 +8,7 @@
 
 %union {
     struct ast *a;
-    double d;
+    int d;
 }
 
 /* declare tokens */
@@ -19,7 +19,7 @@
 %%
 calclist: /* nothing */
 | calclist exp EOL {
-    printf("= %4.4g\n", eval($2)); /* evaluate and print ast */
+    printf("= %1d\n", eval($2)); /* evaluate and print ast */
     treefree($2); /* free ast */
     printf("> ");
 }
@@ -28,12 +28,14 @@ calclist: /* nothing */
 
 exp: factor
 | exp '+' factor { $$ = newast('+', $1,$3); }
-| exp '-' factor { $$ = newast('-', $1,$3);}
 ;
 
 factor: term
 | factor '*' term { $$ = newast('*', $1,$3); }
-| factor '/' term { $$ = newast('/', $1,$3); }
+;
+
+factor: term
+| factor '^' term { $$ = newast('^', $1,$3); }
 ;
 
 term: NUMBER { $$ = newnum($1); }
