@@ -8,7 +8,7 @@ At the moment, this code simply parses boolean expressions into an AST and then 
 $ cd src
 $ make
 $ ./b-logic
-> ((1^0)+(1*0)) + (0^0)   # type some logic
+> ((1^0)+(1*0))+(0^0)   # type some logic
 ```
 
 ### Dependencies
