@@ -1,4 +1,12 @@
-/* b-logic/src/b-parser.y - John Burnett (c) 2016 */
+/* b-logic/src/b-parser.y
+ *
+ * Copyright 2016 - John Bass, DMS Design
+ * Copyright 2016 - John Burnett, Developer
+ *
+ * Create Commons license: Attribution-ShareAlike 4.0 International
+ * (CC BY-SA 4.0)
+ * https://creativecommons.org/licenses/by-sa/4.0/
+ */
 
 %{
 # include <stdio.h>
@@ -20,6 +28,7 @@
 calclist: /* nothing */
 | calclist exp EOL {
     printf("= %1d\n", eval($2)); /* evaluate and print ast */
+    /*traverse($2);*/
     treefree($2); /* free ast */
     printf("> ");
 }

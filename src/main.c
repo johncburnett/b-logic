@@ -1,5 +1,15 @@
 /**
- * b-logic/src/main.c - John Burnett (c) 2016
+ * b-logic/src/main.c
+ *
+ * Copyright 2016 - John Bass, DMS Design
+ * Copyright 2016 - John Burnett, Developer
+ *
+ * Create Commons license: Attribution-ShareAlike 4.0 International
+ * (CC BY-SA 4.0)
+ * https://creativecommons.org/licenses/by-sa/4.0/
+ *
+ * Contains functions for the creation and manipulation digital logic
+ * syntax trees.
  */
 
 #include <stdio.h>
@@ -52,6 +62,48 @@ eval(struct ast *a) {
     }
 
     return v;
+}
+
+
+void
+traverse(struct ast *a) {
+    switch(a->nodetype) {
+
+        /* two subtrees */
+        case '+':
+        case '*':
+        case '^':
+            traverse(a->r);
+
+        /* one subtree */
+        case '|':
+        case 'M':
+            traverse(a->l);
+
+        /* no subtree */
+        case 'K':
+            printf("%d\n", ((struct numval *)a)->number);
+            break;
+        default: printf("internal error: free bad node %c\n", a->nodetype);
+    }
+}
+
+
+void
+and_xor(struct ast *a) {
+    ;
+}
+
+
+void
+and_or_not(struct ast *a) {
+    ;
+}
+
+
+char **
+ast_to_string(struct ast *a) {
+    ;
 }
 
 

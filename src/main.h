@@ -1,5 +1,12 @@
 /**
- * b-logic/src/main.h - John Burnett (c) 2016
+ * b-logic/src/main.h
+ *
+ * Copyright 2016 - John Bass, DMS Design
+ * Copyright 2016 - John Burnett, Developer
+ *
+ * Create Commons license: Attribution-ShareAlike 4.0 International
+ * (CC BY-SA 4.0)
+ * https://creativecommons.org/licenses/by-sa/4.0/
  */
 
 #ifndef main_h
@@ -27,6 +34,18 @@ struct ast *newnum(int d);
 
 /* evaluate an AST */
 int eval(struct ast *);
+
+/* print nodes */
+void traverse(struct ast *);
+
+/* C2 AND-XOR form */
+void and_xor(struct ast *);
+
+/* and_or_not form */
+void and_or_not(struct ast *);
+
+/* convert AST to string */
+char **ast_to_string(struct ast *);
 
 /* delete and free an AST */
 void treefree(struct ast *);
