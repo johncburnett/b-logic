@@ -42,7 +42,6 @@ struct ast *new_node(char **d) {
 
     a->nodetype = 'K';
     a->s = *d;
-    printf("%s\n", *d);
     return (struct ast *)a;
 }
 
