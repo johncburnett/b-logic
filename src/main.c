@@ -8,7 +8,7 @@
  * (CC BY-SA 4.0)
  * https://creativecommons.org/licenses/by-sa/4.0/
  *
- * Contains functions for the creation and manipulation digital logic
+ * Contains functions for the creation and manipulation of digital logic
  * syntax trees.
  */
 
@@ -17,62 +17,44 @@
 #include <stdarg.h>
 #include "main.h"
 
-struct ast *
-newast(int nodetype, struct ast *l, struct ast *r) {
-    struct ast *a = malloc(sizeof(struct ast));
+struct ast *new_ast(int nodetype, struct ast *l, struct ast *r) {
+    struct ast *a = (struct ast *)malloc(sizeof(struct ast));
 
     if(!a) {
-        yyerror("out of space");
+        yyerror((char *)"error: malloc failed");
         exit(0);
     }
 
     a->nodetype = nodetype;
     a->l = l;
     a->r = r;
+    return a;
 }
 
 
-struct ast *
-newnum(int d) {
-    struct numval *a = malloc(sizeof(struct numval));
+struct ast *new_node(char **d) {
+    struct numval *a = (struct numval *)malloc(sizeof(struct numval));
 
     if(!a) {
-        yyerror("out of space");
+        yyerror((char *)"error: malloc failed");
         exit(0);
     }
 
     a->nodetype = 'K';
-    a->number = d;
+    a->s = *d;
+    printf("%s\n", *d);
     return (struct ast *)a;
 }
 
 
-int
-eval(struct ast *a) {
-    int v; /* calculated value of this subtree */
-
-    switch(a->nodetype) {
-        case 'K': v = ((struct numval *)a)->number; break;
-        case '+': v = eval(a->l) | eval(a->r); break;
-        case '*': v = eval(a->l) & eval(a->r); break;
-        case '^': v = eval(a->l) ^ eval(a->r); break;
-        case '|': v = eval(a->l); if(v < 0) v = -v; break;
-        case 'M': v = -eval(a->l); break;
-        default: printf("internal error: bad node %c\n", a->nodetype);
-    }
-
-    return v;
-}
-
-
-void
-traverse(struct ast *a) {
+void traverse(struct ast *a) {
     switch(a->nodetype) {
 
         /* two subtrees */
         case '+':
         case '*':
         case '^':
+            printf("%c\n", a->nodetype);
             traverse(a->r);
 
         /* one subtree */
@@ -82,45 +64,41 @@ traverse(struct ast *a) {
 
         /* no subtree */
         case 'K':
-            printf("%d\n", ((struct numval *)a)->number);
+            printf("%s\n", ((struct numval *)a)->s);
             break;
         default: printf("internal error: free bad node %c\n", a->nodetype);
     }
 }
 
 
-void
-and_xor(struct ast *a) {
+void and_xor(struct ast *a) {
     ;
 }
 
 
-void
-and_or_not(struct ast *a) {
+void and_or_not(struct ast *a) {
     ;
 }
 
 
-char **
-ast_to_string(struct ast *a) {
+void ast_to_string(struct ast *a, char *d[]) {
     ;
 }
 
 
-void
-treefree(struct ast *a) {
+void free_ast(struct ast *a) {
     switch(a->nodetype) {
 
         /* two subtrees */
         case '+':
         case '*':
         case '^':
-            treefree(a->r);
+            free_ast(a->r);
 
         /* one subtree */
         case '|':
         case 'M':
-            treefree(a->l);
+            free_ast(a->l);
 
         /* no subtree */
         case 'K':
@@ -131,8 +109,7 @@ treefree(struct ast *a) {
 }
 
 
-void
-yyerror(char *s, ...) {
+void yyerror(char *s, ...) {
     va_list ap;
     va_start(ap, s);
 
@@ -142,8 +119,7 @@ yyerror(char *s, ...) {
 }
 
 
-int
-main() {
+int main() {
     printf("> ");
     return yyparse();
 }

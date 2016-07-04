@@ -16,7 +16,7 @@
 extern int yylineno; /* from lexer */
 void yyerror(char *s, ...);
 
-/* nodes in the abstract syntax tree */
+/* abstract syntax tree data structure */
 struct ast {
     int nodetype;
     struct ast *l;
@@ -25,15 +25,12 @@ struct ast {
 
 struct numval {
     int nodetype; /* type K for constant */
-    int number;
+    char *s;
 };
 
 /* build an AST */
-struct ast *newast(int nodetype, struct ast *l, struct ast *r);
-struct ast *newnum(int d);
-
-/* evaluate an AST */
-int eval(struct ast *);
+struct ast *new_ast(int nodetype, struct ast *l, struct ast *r);
+struct ast *new_node(char** d);
 
 /* print nodes */
 void traverse(struct ast *);
@@ -45,9 +42,9 @@ void and_xor(struct ast *);
 void and_or_not(struct ast *);
 
 /* convert AST to string */
-char **ast_to_string(struct ast *);
+void ast_to_string(struct ast *, char **);
 
 /* delete and free an AST */
-void treefree(struct ast *);
+void free_ast(struct ast *);
 
 #endif
