@@ -43,9 +43,6 @@ exp: factor
 
 factor: term
 | factor '*' term { $$ = new_ast('*', $1,$3); }
-;
-
-factor: term
 | factor '^' term { $$ = new_ast('^', $1,$3); }
 ;
 
@@ -57,8 +54,8 @@ term: STRING {
     b[3] = '\0';
     $$ = new_node(&b);
 }
+| '!' term { $$ = new_ast('!', $2, NULL); }
 | '|' term { $$ = new_ast('|', $2, NULL); }
 | '(' exp ')' { $$ = $2; }
-| '-' term { $$ = new_ast('M', $2, NULL); }
 ;
 %%

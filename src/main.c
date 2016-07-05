@@ -57,6 +57,7 @@ void traverse(struct ast *a) {
             traverse(a->r);
 
         /* one subtree */
+        case '!':
         case '|':
         case 'M':
             traverse(a->l);
@@ -65,7 +66,7 @@ void traverse(struct ast *a) {
         case 'K':
             printf("%s\n", ((struct numval *)a)->s);
             break;
-        default: printf("internal error: free bad node %c\n", a->nodetype);
+        default: printf("internal error: found bad node %c\n", a->nodetype);
     }
 }
 
@@ -95,6 +96,7 @@ void free_ast(struct ast *a) {
             free_ast(a->r);
 
         /* one subtree */
+        case '!':
         case '|':
         case 'M':
             free_ast(a->l);
