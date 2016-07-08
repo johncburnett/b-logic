@@ -30,7 +30,9 @@
 %%
 calclist: /* nothing */
 | calclist exp EOL {
-    traverse($2);
+    /*traverse($2);*/
+    generate_pla($2);
+    and_or_not($2);
     free_ast($2); /* free ast */
     printf("> ");
 }

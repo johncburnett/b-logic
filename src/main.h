@@ -12,8 +12,8 @@
 #ifndef main_h
 #define main_h
 
-/* interface to the lexer */
-extern int yylineno; /* from lexer */
+/* interface with lexer */
+extern int yylineno;
 void yyerror(char *s, ...);
 
 /* abstract syntax tree data structure */
@@ -26,7 +26,12 @@ struct ast {
 struct numval {
     int nodetype; /* type K for constant */
     char *s;
+    int val;
 };
+
+/* list of tokens */
+struct numval *tokens[100];
+int num_tokens;
 
 /* build an AST */
 struct ast *new_ast(int nodetype, struct ast *l, struct ast *r);
@@ -34,6 +39,18 @@ struct ast *new_node(char** d);
 
 /* print nodes */
 void traverse(struct ast *);
+
+/* delete and free an AST */
+void free_ast(struct ast *);
+
+/* add tokens to list */
+void add_token(struct numval *);
+
+/* convert AST to PLA and write to .pla file */
+void generate_pla(struct ast *);
+
+/* evaluate ast */
+int eval(struct ast *);
 
 /* C2 AND-XOR form */
 void and_xor(struct ast *);
@@ -43,8 +60,5 @@ void and_or_not(struct ast *);
 
 /* convert AST to string */
 void ast_to_string(struct ast *, char **);
-
-/* delete and free an AST */
-void free_ast(struct ast *);
 
 #endif

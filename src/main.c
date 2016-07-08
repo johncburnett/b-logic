@@ -15,6 +15,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include "main.h"
 
 struct ast *new_ast(int nodetype, struct ast *l, struct ast *r) {
@@ -42,6 +46,9 @@ struct ast *new_node(char **d) {
 
     a->nodetype = 'K';
     a->s = *d;
+    a->val = 0;
+    add_token(a);
+
     return (struct ast *)a;
 }
 
@@ -71,21 +78,6 @@ void traverse(struct ast *a) {
 }
 
 
-void and_xor(struct ast *a) {
-    ;
-}
-
-
-void and_or_not(struct ast *a) {
-    ;
-}
-
-
-void ast_to_string(struct ast *a, char *d[]) {
-    ;
-}
-
-
 void free_ast(struct ast *a) {
     switch(a->nodetype) {
 
@@ -110,6 +102,100 @@ void free_ast(struct ast *a) {
 }
 
 
+void add_token(struct numval *a) {
+    for(int i = 0; i < num_tokens; i++) {
+        if(strcmp(a->s, tokens[i]->s) != 0) {
+            break;
+        }
+    }
+    tokens[num_tokens] = a;
+    num_tokens++;
+}
+
+
+void generate_pla(struct ast *a) {
+    int counter = 0;
+    int max = 1 << num_tokens;
+    int result = 0;
+    FILE *pla = fopen("in.pla", "w+");
+
+    // format pla file header
+    fprintf(pla, ".i %d\n", num_tokens);
+    fprintf(pla, ".o 1\n");
+    fprintf(pla, ".ilb ");
+    for(int i = num_tokens-1; i >= 0; i--) {
+        fprintf(pla, "%s ", tokens[i]->s);
+    }
+    fprintf(pla, "\n.ob %s\n", "F");
+
+    // generate and write pla
+    for(int i = 0; i < max; i++) {
+        for(int j = num_tokens-1; j >= 0; j--) {
+            int is_set = counter & (1 << j); /* check jth bit */
+            int bit = 0;
+            if(is_set) bit = 1;
+            tokens[j]->val = bit;
+            fprintf(pla, "%d", bit);
+        }
+        result = eval(a);
+        fprintf(pla, " %i\n", result);
+        counter++;
+    }
+    fprintf(pla, ".e\n");
+    fclose(pla);
+}
+
+
+int eval(struct ast *a) {
+    int v;
+
+    switch(a->nodetype) {
+        case 'K': v = ((struct numval *)a)->val; break;
+        case '+': v = eval(a->l) | eval(a->r); break;
+        case '*': v = eval(a->l) & eval(a->r); break;
+        case '^': v = eval(a->l) ^ eval(a->r); break;
+        case '|': v = eval(a->l); if(v < 0) v = -v; break;
+        case '!': v = !eval(a->l); break;
+        default: printf("internal error: bad node %c\n", a->nodetype); }
+    return v;
+}
+
+
+void and_xor(struct ast *a) {
+    ;
+}
+
+
+void and_or_not(struct ast *a) {
+    char *args[5];
+    args[0] = (char *)"espresso";
+    args[1] = (char *)"-o";
+    args[2] = (char *)"eqntott";
+    args[3] = (char *)"in.pla";
+    args[4] = NULL;
+
+    pid_t pid;
+    int status;
+
+    if((pid=fork()) == 0) { // fork to run espresso executable
+        execvp(*args, args);
+        fprintf(stderr, "internal error: espresso failed to run\n");
+        exit(1);
+    }
+    else { // parent
+        if(pid == (pid_t)(-1)) {
+            fprintf(stderr, "internal error: fork failed.\n"); exit(1);
+        }
+        wait(&status);
+    }
+}
+
+
+void ast_to_string(struct ast *a, char **d) {
+    ;
+}
+
+
 void yyerror(char *s, ...) {
     va_list ap;
     va_start(ap, s);
@@ -121,6 +207,7 @@ void yyerror(char *s, ...) {
 
 
 int main() {
+    num_tokens = 0;
     printf("> ");
     return yyparse();
 }

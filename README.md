@@ -1,7 +1,7 @@
 # b-logic
-b-logic uses flex/bison to load a digital logic expression into an Abstract Syntax Tree. This tool will then minimize the expression into C2 AND-XOR form.
+b-logic uses flex/bison to load a digital logic expression into an Abstract Syntax Tree. This tool will then minimize the expression into Sum of Products AND-OR-NOT form as well as C2 AND-XOR form.
 
-At the moment, this code simply parses boolean expressions into an AST and prints a traversal of the tree.
+As of now, the the program runs as a prompt and accepts digital logic expressions using the operators "+, \*, ^, !". The prompt returns espresso's SoP minimization of the input.
 
 ### Running
 ```shell
@@ -15,3 +15,4 @@ $ ./b-logic
 * gcc
 * flex
 * bison
+* espresso logic minimizer (accessible from $PATH)
