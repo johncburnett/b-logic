@@ -23,7 +23,7 @@
 "|" |
 "(" |
 ")"     { return yytext[0]; }
-[a-zA-Z]{2}[0-9] {
+[a-zA-Z][a-zA-Z0-9]* {
     strcpy(yylval.s, yytext);
     return STRING;
 }

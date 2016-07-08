@@ -14,6 +14,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "main.h"
 %}
 
@@ -49,11 +50,12 @@ factor: term
 ;
 
 term: STRING {
-    char *b = (char *)malloc(sizeof(char) * 4);
-    for(int i = 0; i < 3; i++) {
+    int len = strlen(yyval.s);
+    char *b = (char *)malloc(sizeof(char) * (len+1));
+    for(int i = 0; i < len; i++) {
         b[i] = yyval.s[i];
     }
-    b[3] = '\0';
+    b[len] = '\0';
     $$ = new_node(&b);
 }
 | '!' term { $$ = new_ast('!', $2, NULL); }

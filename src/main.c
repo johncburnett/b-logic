@@ -1,4 +1,4 @@
-/**
+/*
  * b-logic/src/main.c
  *
  * Copyright 2016 - John Bass, DMS Design
@@ -56,20 +56,20 @@ struct ast *new_node(char **d) {
 void traverse(struct ast *a) {
     switch(a->nodetype) {
 
-        /* two subtrees */
+        // two subtrees
         case '+':
         case '*':
         case '^':
             printf("%c\n", a->nodetype);
             traverse(a->r);
 
-        /* one subtree */
+        // one subtree
         case '!':
         case '|':
         case 'M':
             traverse(a->l);
 
-        /* no subtree */
+        // no subtree
         case 'K':
             printf("%s\n", ((struct numval *)a)->s);
             break;
@@ -81,19 +81,19 @@ void traverse(struct ast *a) {
 void free_ast(struct ast *a) {
     switch(a->nodetype) {
 
-        /* two subtrees */
+        // two subtrees
         case '+':
         case '*':
         case '^':
             free_ast(a->r);
 
-        /* one subtree */
+        // one subtree
         case '!':
         case '|':
         case 'M':
             free_ast(a->l);
 
-        /* no subtree */
+        // no subtree
         case 'K':
             free(a);
             break;
@@ -131,7 +131,7 @@ void generate_pla(struct ast *a) {
     // generate and write pla
     for(int i = 0; i < max; i++) {
         for(int j = num_tokens-1; j >= 0; j--) {
-            int is_set = counter & (1 << j); /* check jth bit */
+            int is_set = counter & (1 << j); // check jth bit
             int bit = 0;
             if(is_set) bit = 1;
             tokens[j]->val = bit;
