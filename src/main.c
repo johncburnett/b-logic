@@ -78,6 +78,21 @@ void traverse(struct ast *a) {
 }
 
 
+int eval(struct ast *a) {
+    int v;
+
+    switch(a->nodetype) {
+        case 'K': v = ((struct numval *)a)->val; break;
+        case '+': v = eval(a->l) | eval(a->r); break;
+        case '*': v = eval(a->l) & eval(a->r); break;
+        case '^': v = eval(a->l) ^ eval(a->r); break;
+        case '|': v = eval(a->l); if(v < 0) v = -v; break;
+        case '!': v = !eval(a->l); break;
+        default: printf("internal error: bad node %c\n", a->nodetype); }
+    return v;
+}
+
+
 void free_ast(struct ast *a) {
     switch(a->nodetype) {
 
@@ -146,26 +161,6 @@ void generate_pla(struct ast *a) {
 }
 
 
-int eval(struct ast *a) {
-    int v;
-
-    switch(a->nodetype) {
-        case 'K': v = ((struct numval *)a)->val; break;
-        case '+': v = eval(a->l) | eval(a->r); break;
-        case '*': v = eval(a->l) & eval(a->r); break;
-        case '^': v = eval(a->l) ^ eval(a->r); break;
-        case '|': v = eval(a->l); if(v < 0) v = -v; break;
-        case '!': v = !eval(a->l); break;
-        default: printf("internal error: bad node %c\n", a->nodetype); }
-    return v;
-}
-
-
-void and_xor(struct ast *a) {
-    ;
-}
-
-
 void and_or_not(struct ast *a) {
     char *args[5];
     args[0] = (char *)"espresso";
@@ -177,6 +172,11 @@ void and_or_not(struct ast *a) {
     pid_t pid;
     int status;
 
+    FILE *f_out = freopen("out.pla", "w+", stdout); // open output file
+    int fd = fileno(f_out); // get file descriptor
+    int saved_stdout = dup(1); // save stdout
+    dup2(fd, 1); // replace stdout
+
     if((pid=fork()) == 0) { // fork to run espresso executable
         execvp(*args, args);
         fprintf(stderr, "internal error: espresso failed to run\n");
@@ -187,7 +187,15 @@ void and_or_not(struct ast *a) {
             fprintf(stderr, "internal error: fork failed.\n"); exit(1);
         }
         wait(&status);
+        dup2(saved_stdout, 1); // restore stdout
+        close(saved_stdout);
+        exit(0);
     }
+}
+
+
+void and_xor(struct ast *a) {
+    ;
 }
 
 
@@ -203,11 +211,4 @@ void yyerror(char *s, ...) {
     fprintf(stderr, "%d: error: ", yylineno);
     vfprintf(stderr, s, ap);
     fprintf(stderr, "\n");
-}
-
-
-int main() {
-    num_tokens = 0;
-    printf("> ");
-    return yyparse();
 }

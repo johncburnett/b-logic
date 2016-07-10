@@ -12,9 +12,14 @@
 #ifndef main_h
 #define main_h
 
+#include <stdio.h>
+
 // interface with lexer
 extern int yylineno;
 void yyerror(char *s, ...);
+int yylex();
+int yyparse();
+extern FILE * yyin;
 
 // abstract syntax tree data structure
 struct ast {
@@ -29,28 +34,26 @@ struct numval {
     int val;
 };
 
+// root of AST
+struct ast *root;
+
 // list of tokens
 struct numval *tokens[100];
 int num_tokens;
 
-// build an AST
-struct ast *new_ast(int nodetype, struct ast *l, struct ast *r);
-struct ast *new_node(char** d);
+// AST functions
+struct ast *new_ast(int nodetype, struct ast *l, struct ast *r); // build AST
+struct ast *new_node(char** d); // add a leaf
+void traverse(struct ast *); // print nodes
+int eval(struct ast *); // evaluate ast
+void free_ast(struct ast *); // delete and free an AST
 
-// print nodes
-void traverse(struct ast *);
-
-// delete and free an AST
-void free_ast(struct ast *);
-
-// add tokens to list
-void add_token(struct numval *);
+// token list functions
+void add_token(struct numval *); // add token to array
+void free_tokens(void); // free array of tokens
 
 // convert AST to PLA and write to .pla file
 void generate_pla(struct ast *);
-
-// evaluate ast
-int eval(struct ast *);
 
 // C2 AND-XOR form
 void and_xor(struct ast *);

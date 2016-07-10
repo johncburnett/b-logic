@@ -20,7 +20,7 @@
 
 %union {
     struct ast *a;
-    char s[4];
+    char s[50];
 }
 
 /* tokens */
@@ -31,13 +31,9 @@
 %%
 calclist: /* nothing */
 | calclist exp EOL {
-    /*traverse($2);*/
-    generate_pla($2);
-    and_or_not($2);
-    free_ast($2); /* free ast */
-    printf("> ");
+    root = $2;
+    return 0;
 }
-| calclist EOL { printf("> "); } /* blank line or a comment */
 ;
 
 exp: factor
