@@ -17,4 +17,4 @@ and_xor: main.o b-parser.tab.c b-lexer.lex.c and_xor.c
 	$(CC) $(CFLAGS) and_xor.c main.o b-parser.tab.c b-lexer.lex.c -o $@
 
 clean:
-	rm -f b-parser.tab.* b-lexer.lex.c *.pla *.o and_or_not and_xor
+	rm -f b-parser.tab.* b-lexer.lex.c *.pla *.o *.gch and_or_not and_xor

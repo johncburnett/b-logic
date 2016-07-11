@@ -50,7 +50,7 @@ void free_ast(struct ast *); // delete and free an AST
 
 // token list functions
 void add_token(struct numval *); // add token to array
-void free_tokens(void); // free array of tokens
+void empty_tokens(void); // free array of tokens
 
 // convert AST to PLA and write to .pla file
 void generate_pla(struct ast *);
@@ -60,6 +60,12 @@ void and_xor(struct ast *);
 
 // and_or_not form
 void and_or_not(struct ast *);
+
+// changes notation of espresso output
+void reformat_pla();
+
+// print contents of a file
+void print_file(char **fname);
 
 // convert AST to string
 void ast_to_string(struct ast *, char **);

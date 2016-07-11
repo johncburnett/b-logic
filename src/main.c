@@ -128,6 +128,20 @@ void add_token(struct numval *a) {
 }
 
 
+void empty_tokens(void) {
+    for(int i = 0; i < num_tokens; i++) {
+        tokens[i] = NULL;
+    }
+    num_tokens = 0;
+}
+
+
+/*
+ * generate_pla
+ *
+ * to convert our AST into a PLA, we iterate through an n-bit number (one bit
+ * for every token) and evaluate the tree for every combination of truth values
+ */
 void generate_pla(struct ast *a) {
     int counter = 0;
     int max = 1 << num_tokens;
@@ -161,6 +175,11 @@ void generate_pla(struct ast *a) {
 }
 
 
+/*
+ * and_or_not
+ *
+ * to minimize to SoP, we simply need to run our PLA file through espresso
+ */
 void and_or_not(struct ast *a) {
     char *args[5];
     args[0] = (char *)"espresso";
@@ -184,18 +203,63 @@ void and_or_not(struct ast *a) {
     }
     else { // parent
         if(pid == (pid_t)(-1)) {
-            fprintf(stderr, "internal error: fork failed.\n"); exit(1);
+            fprintf(stderr, "internal error: fork failed\n"); exit(1);
         }
-        wait(&status);
+        wait(&status); // wait for child
         dup2(saved_stdout, 1); // restore stdout
         close(saved_stdout);
-        exit(0);
     }
 }
 
 
 void and_xor(struct ast *a) {
     ;
+}
+
+
+/*
+ * reformat_pla
+ *
+ * erases the LHS and switches operator notation of espresso's output
+ */
+void reformat_pla(void) {
+    FILE *fp = fopen("out.pla", "r"); // open espresso output
+
+    char c;
+    char output[1000];
+    int i = 0;
+
+    for(int j = 0; j < 4; j++) {
+        fgetc(fp); // skip over LHS
+    }
+    while( (c=fgetc(fp)) != ';' ) {
+        if(c == '&') {
+            output[i] = '*';
+        }
+        else if(c == '|') {
+            output[i] = '+';
+        }
+        else {
+            output[i] = c;
+        }
+        i++;
+    }
+    output[i] = '\0';
+
+    // overwrite file
+    freopen(NULL, "w+", fp);
+    fprintf(fp, "%s\n", output);
+    fclose(fp);
+}
+
+
+void print_file(char **fname) {
+    FILE *fp = fopen(*fname, "r");
+    int c;
+    while ((c = getc(fp)) != EOF) {
+        putchar(c);
+    }
+    fclose(fp);
 }
 
 

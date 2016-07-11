@@ -1,5 +1,5 @@
 /**
- * b-logic/src/and_xor.c - John Burnett (c) 2016
+ * b-logic/src/and_or_not.c - John Burnett (c) 2016
  *
  * Copyright 2016 - John Bass, DMS Design
  * Copyright 2016 - John Burnett, Developer
@@ -30,10 +30,17 @@ int main(int argc, char *argv[]) {
 
     yyparse();
     generate_pla(root);
+
     and_or_not(root);
+    freopen ("/dev/tty", "a", stdout); // make sure stdout is restored
+
     free_ast(root);
+    empty_tokens();
+    reformat_pla();
 
-
+    char *fname = (char *)"out.pla";
+    printf("%s\n", fname);
+    print_file(&fname);
 
     return 0;
 }
