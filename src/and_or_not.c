@@ -24,12 +24,16 @@ int main(int argc, char *argv[]) {
             exit(1);
         }
     }
+    else {
+        printf("> "); // prompt
+    }
 
-    printf("> ");
     yyparse();
     generate_pla(root);
     and_or_not(root);
     free_ast(root);
+
+
 
     return 0;
 }
