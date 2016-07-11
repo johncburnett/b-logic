@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     generate_pla(root);
 
     and_or_not(root);
-    freopen ("/dev/tty", "a", stdout); // make sure stdout is restored
+    freopen("/dev/tty", "a", stdout); // make sure stdout is restored
 
     free_ast(root);
     empty_tokens();

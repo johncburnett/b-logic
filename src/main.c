@@ -236,6 +236,9 @@ void reformat_pla(void) {
         else if(c == '|') {
             output[i] = '+';
         }
+        else if(c == '\n' || c == ' ') {
+            continue;
+        }
         else {
             output[i] = c;
         }
