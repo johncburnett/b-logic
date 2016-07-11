@@ -7,9 +7,6 @@
  * Create Commons license: Attribution-ShareAlike 4.0 International
  * (CC BY-SA 4.0)
  * https://creativecommons.org/licenses/by-sa/4.0/
- *
- * Contains functions for the creation and manipulation of digital logic
- * syntax trees.
  */
 
 #include <stdio.h>
@@ -65,8 +62,6 @@ void traverse(struct ast *a) {
 
         // one subtree
         case '!':
-        case '|':
-        case 'M':
             traverse(a->l);
 
         // no subtree
@@ -86,7 +81,6 @@ int eval(struct ast *a) {
         case '+': v = eval(a->l) | eval(a->r); break;
         case '*': v = eval(a->l) & eval(a->r); break;
         case '^': v = eval(a->l) ^ eval(a->r); break;
-        case '|': v = eval(a->l); if(v < 0) v = -v; break;
         case '!': v = !eval(a->l); break;
         default: printf("internal error: bad node %c\n", a->nodetype); }
     return v;
@@ -104,8 +98,6 @@ void free_ast(struct ast *a) {
 
         // one subtree
         case '!':
-        case '|':
-        case 'M':
             free_ast(a->l);
 
         // no subtree
@@ -212,6 +204,11 @@ void and_or_not(struct ast *a) {
 }
 
 
+/*
+ * and_xor
+ *
+ * TODO
+ */
 void and_xor(struct ast *a) {
     ;
 }

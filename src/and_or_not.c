@@ -29,6 +29,7 @@ int main(int argc, char *argv[]) {
     }
 
     yyparse();
+    fclose(yyin);
     generate_pla(root);
 
     and_or_not(root);
@@ -38,6 +39,7 @@ int main(int argc, char *argv[]) {
     empty_tokens();
     reformat_pla();
 
+    // print output
     char *fname = (char *)"out.pla";
     print_file(&fname);
 

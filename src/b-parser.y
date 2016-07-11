@@ -55,7 +55,6 @@ term: STRING {
     $$ = new_node(&b);
 }
 | '!' term { $$ = new_ast('!', $2, NULL); }
-| '|' term { $$ = new_ast('|', $2, NULL); }
 | '(' exp ')' { $$ = $2; }
 ;
 %%

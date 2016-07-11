@@ -1,7 +1,7 @@
 # b-logic
 b-logic uses flex/bison to parse a digital logic expression into an abstract syntax tree. This tool then minimizes the expression into Sum of Products AND-OR-NOT form as well as C2 AND-XOR form.
 
-As of now, these programs - the executables `and_or_not` and `and_xor` - accept digital logic expressions which use the operators "+, \*, ^, !". The program writes the espresso input to `in.pla` and espresso's minimization to `out.pla`. Input can be given through either `stdin` or a file passed as a command line argument.
+These programs - the executables `and_or_not` and `and_xor` - accept digital logic expressions which use the operators "+, \*, ^, !". These programs write the converted input to `in.pla` and the minimizations to `out.pla`. Input can be given through either `stdin` or a file passed as a command line argument. Variable names are of the form `[a-zA-Z][a-zA-Z0-9]*`.
 
 ### Running
 ```shell

@@ -10,8 +10,48 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "main.h"
 
 int main(int argc, char *argv[]) {
+    num_tokens = 0;
+
+    // set yyin to file if passed by user
+    if(argc > 1) {
+        yyin = fopen(argv[1], "r");
+        if(yyin == NULL) {
+            printf("error: invalid file\n");
+            exit(1);
+        }
+    }
+    else {
+        printf("> "); // prompt
+    }
+
+    yyparse();
+    fclose(yyin);
+    generate_pla(root);
+
+    and_or_not(root);
+    freopen ("/dev/tty", "a", stdout); // make sure stdout is restored
+
+    free_ast(root);
+    empty_tokens();
+    reformat_pla();
+
+    // now we parse the SoP form of our input and minimize manually
+    yyin = fopen("out.pla", "r");
+    yyparse();
+    fclose(yyin);
+
+    and_xor(root); // TODO
+
+    free_ast(root);
+    empty_tokens();
+
+    // print output
+    char *fname = (char *)"out.pla";
+    print_file(&fname);
+
     return 0;
 }
