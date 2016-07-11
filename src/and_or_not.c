@@ -39,7 +39,6 @@ int main(int argc, char *argv[]) {
     reformat_pla();
 
     char *fname = (char *)"out.pla";
-    printf("%s\n", fname);
     print_file(&fname);
 
     return 0;
