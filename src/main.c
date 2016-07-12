@@ -110,13 +110,32 @@ void free_ast(struct ast *a) {
 
 
 void add_token(struct numval *a) {
-    for(int i = 0; i < num_tokens; i++) {
-        if(strcmp(a->s, tokens[i]->s) != 0) {
-            break;
+    if(num_vars == 0) {
+        var_names[num_vars] = a->s;
+        num_vars++;
+    } else {
+        for(int i = 0; i < num_vars; i++) {
+            if(strcmp(a->s, var_names[i]) == 0) {
+                break;
+            }
+            else if(i == num_vars-1) {
+                var_names[num_vars] = a->s;
+                num_vars++;
+                break;
+            }
         }
     }
     tokens[num_tokens] = a;
     num_tokens++;
+}
+
+
+void set_node(int var_index, int bit) {
+    for(int i = 0; i < num_tokens; i++) {
+        if(strcmp(var_names[var_index], tokens[i]->s) == 0) {
+            tokens[i]->val = bit;
+        }
+    }
 }
 
 
@@ -136,26 +155,27 @@ void empty_tokens(void) {
  */
 void generate_pla(struct ast *a) {
     int counter = 0;
-    int max = 1 << num_tokens;
+    int max = 1 << num_vars;
     int result = 0;
     FILE *pla = fopen("in.pla", "w+");
 
     // format pla file header
-    fprintf(pla, ".i %d\n", num_tokens);
+    fprintf(pla, ".i %d\n", num_vars);
     fprintf(pla, ".o 1\n");
     fprintf(pla, ".ilb ");
-    for(int i = num_tokens-1; i >= 0; i--) {
-        fprintf(pla, "%s ", tokens[i]->s);
+    for(int i = num_vars-1; i >= 0; i--) {
+        fprintf(pla, "%s ", var_names[i]);
     }
     fprintf(pla, "\n.ob %s\n", "F");
 
     // generate and write pla
     for(int i = 0; i < max; i++) {
-        for(int j = num_tokens-1; j >= 0; j--) {
+        for(int j = num_vars-1; j >= 0; j--) {
             int is_set = counter & (1 << j); // check jth bit
             int bit = 0;
             if(is_set) bit = 1;
-            tokens[j]->val = bit;
+            // tokens[j]->val = bit;
+            set_node(j, bit);
             fprintf(pla, "%d", bit);
         }
         result = eval(a);
@@ -166,11 +186,11 @@ void generate_pla(struct ast *a) {
     fclose(pla);
 }
 
-
 /*
  * and_or_not
  *
- * to minimize to SoP, we simply need to run our PLA file through espresso
+ * to minimize to SoP, we simply need to run our PLA file through the espresso
+ * executable by forking a child process
  */
 void and_or_not(struct ast *a) {
     char *args[5];
@@ -195,7 +215,8 @@ void and_or_not(struct ast *a) {
     }
     else { // parent
         if(pid == (pid_t)(-1)) {
-            fprintf(stderr, "internal error: fork failed\n"); exit(1);
+            fprintf(stderr, "internal error: fork failed\n");
+            exit(1);
         }
         wait(&status); // wait for child
         dup2(saved_stdout, 1); // restore stdout
@@ -219,7 +240,7 @@ void and_xor(struct ast *a) {
  *
  * erases the LHS and switches operator notation of espresso's output
  */
-void reformat_pla(void) {
+void reformat_output(void) {
     FILE *fp = fopen("out.pla", "r"); // open espresso output
 
     char c;
@@ -250,6 +271,11 @@ void reformat_pla(void) {
     freopen(NULL, "w+", fp);
     fprintf(fp, "%s\n", output);
     fclose(fp);
+}
+
+
+void generate_minterms(struct ast *a) {
+    ;
 }
 
 

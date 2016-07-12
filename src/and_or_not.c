@@ -15,6 +15,7 @@
 
 int main(int argc, char *argv[]) {
     num_tokens = 0;
+    num_vars = 0;
 
     // set yyin to file if passed by user
     if(argc > 1) {
@@ -37,7 +38,7 @@ int main(int argc, char *argv[]) {
 
     free_ast(root);
     empty_tokens();
-    reformat_pla();
+    reformat_output();
 
     // print output
     char *fname = (char *)"out.pla";

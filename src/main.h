@@ -34,12 +34,25 @@ struct numval {
     int val;
 };
 
+// holds strings and values for each term in a minterm
+struct minterm {
+    char **terms;
+    int *values;
+    int n;
+};
+
+// list of minterms
+struct minterm *expression;
+int num_minterms;
+
 // root of AST
 struct ast *root;
 
 // list of tokens
 struct numval *tokens[100];
 int num_tokens;
+char *var_names[100]; // list of individual variable names
+int num_vars;
 
 // AST functions
 struct ast *new_ast(int nodetype, struct ast *l, struct ast *r); // build AST
@@ -62,7 +75,10 @@ void and_xor(struct ast *);
 void and_or_not(struct ast *);
 
 // changes notation of espresso output
-void reformat_pla();
+void reformat_output(void);
+
+// generate minterms from PLA
+void generate_minterms(struct ast *);
 
 // print contents of a file
 void print_file(char **fname);
