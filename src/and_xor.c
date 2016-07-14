@@ -1,5 +1,5 @@
 /**
- * b-logic/src/and_xor.c - John Burnett (c) 2016
+ * b-logic/src/and_xor.c
  *
  * Copyright 2016 - John Bass, DMS Design
  * Copyright 2016 - John Burnett, Developer
@@ -16,6 +16,7 @@
 int main(int argc, char *argv[]) {
     num_tokens = 0;
     num_vars = 0;
+    num_minterms = 0;
 
     // set yyin to file if passed by user
     if(argc > 1) {
@@ -46,9 +47,10 @@ int main(int argc, char *argv[]) {
     yyparse();
     fclose(yyin);
 
-    // generate_pla(root);
+    generate_minterms(root);
+    minterms_to_ascii();
 
-    and_xor(root); // TODO
+    and_xor(root);
 
     free_ast(root);
     empty_tokens();

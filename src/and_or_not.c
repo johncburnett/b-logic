@@ -1,5 +1,5 @@
 /**
- * b-logic/src/and_or_not.c - John Burnett (c) 2016
+ * b-logic/src/and_or_not.c
  *
  * Copyright 2016 - John Bass, DMS Design
  * Copyright 2016 - John Burnett, Developer

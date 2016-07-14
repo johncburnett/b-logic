@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS =
+CFLAGS = -std=gnu11
 
 all: b-logic main.o and_or_not and_xor
 

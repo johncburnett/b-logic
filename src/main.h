@@ -36,13 +36,13 @@ struct numval {
 
 // holds strings and values for each term in a minterm
 struct minterm {
-    char **terms;
-    int *values;
+    char *terms[100];
+    int values[100];
     int n;
 };
 
 // list of minterms
-struct minterm *expression;
+struct minterm *expression[100];
 int num_minterms;
 
 // root of AST
@@ -68,17 +68,26 @@ void empty_tokens(void); // free array of tokens
 // convert AST to PLA and write to .pla file
 void generate_pla(struct ast *);
 
-// C2 AND-XOR form
-void and_xor(struct ast *);
-
 // and_or_not form
 void and_or_not(struct ast *);
+
+// C2 AND-XOR form
+void and_xor(struct ast *);
+struct indices {
+    int v[100];
+    int n;
+};
+struct indices *c2_terms;
+int c2_len;
+int choose(int, int);
+void combinations(int, int, int, struct indices, int);
 
 // changes notation of espresso output
 void reformat_output(void);
 
 // generate minterms from PLA
 void generate_minterms(struct ast *);
+void minterms_to_ascii(void);
 
 // print contents of a file
 void print_file(char **fname);

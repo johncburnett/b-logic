@@ -151,7 +151,7 @@ void empty_tokens(void) {
  * generate_pla
  *
  * to convert our AST into a PLA, we iterate through an n-bit number (one bit
- * for every token) and evaluate the tree for every combination of truth values
+ * for every variable) and evaluate the tree for every combination of truth values
  */
 void generate_pla(struct ast *a) {
     int counter = 0;
@@ -174,7 +174,6 @@ void generate_pla(struct ast *a) {
             int is_set = counter & (1 << j); // check jth bit
             int bit = 0;
             if(is_set) bit = 1;
-            // tokens[j]->val = bit;
             set_node(j, bit);
             fprintf(pla, "%d", bit);
         }
@@ -228,10 +227,104 @@ void and_or_not(struct ast *a) {
 /*
  * and_xor
  *
- * TODO
+ * recursive generation of c2 variables and generation of c2 form
  */
 void and_xor(struct ast *a) {
-    ;
+    // calculate number of possible c2 terms
+    int num_c2_terms = 0;
+    for(int i = 0; i < num_vars; i++) {
+        num_c2_terms += choose(num_vars, i+1);
+    }
+
+    // initialize table
+    int c2_table[num_minterms][num_c2_terms];
+    for(int i = 0; i < num_minterms; i++) {
+        for(int j = 0; j < num_c2_terms; j++) {
+            c2_table[i][j] = 0;
+        }
+    }
+
+    // generate all possible c2 terms (using the index of the variable)
+    c2_terms = (struct indices *)malloc(sizeof(struct indices)*num_c2_terms);
+    c2_len = 0;
+    for(int i = 1; i < num_vars+1; i++) {
+        struct indices r;
+        r.n = i;
+        combinations(num_vars, i, 0, r, i);
+    }
+
+    // search terms and set table
+    for(int i = 0; i < num_minterms; i++) {
+        for(int j = 0; j < expression[i]->n; j++) {
+            if(expression[i]->values[j] == 1) {
+                for(int k = 0; k < num_c2_terms; k++) {
+                    for(int l = 0; l < c2_terms[k].n; l++) {
+                        if(j == c2_terms[k].v[l]) {
+                            c2_table[i][k] = 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    int c2_final[num_c2_terms];
+    int c2_last_index;
+
+    // count columns, if odd then include term
+    for(int j = 0; j < num_c2_terms; j++) {
+        int total = 0;
+        for(int i = 0; i < num_minterms; i++) {
+            if(c2_table[i][j] == 1) {
+                total++;
+            }
+        }
+        c2_final[j] = total % 2;
+        if(c2_final[j]) {
+            c2_last_index = j;
+        }
+    }
+
+    FILE *fp = fopen("out.pla", "w+");
+    for(int i = 0; i < c2_last_index+1; i++) {
+        if(c2_final[i] == 1) {
+            fprintf(fp, "(");
+            for(int j = 0; j < c2_terms[i].n; j++) {
+                int index = c2_terms[i].v[j];
+                fprintf(fp, "%s", expression[0]->terms[index]);
+                if(j != c2_terms[i].n-1) {
+                    fprintf(fp, "*");
+                }
+            }
+            fprintf(fp, ")");
+            if(i != c2_last_index) {
+                fprintf(fp, "^");
+            }
+        }
+    }
+    fprintf(fp, "\n");
+    fclose(fp);
+
+    free(c2_terms);
+}
+
+
+int choose(int n, int k) {
+    if(k==0)    return 1;
+    else        return (n * choose(n-1, k-1)) / k;
+}
+
+
+void combinations(int s_len, int len, int start, struct indices r, int r_len) {
+    if(len == 0) {
+        c2_terms[c2_len] = r;
+        c2_len++;
+        return;
+    }
+    for(int i = start; i <= s_len - len; i++) {
+        r.v[r_len - len] = i;
+        combinations(s_len, len-1, i+1, r, r_len);
+    }
 }
 
 
@@ -275,7 +368,47 @@ void reformat_output(void) {
 
 
 void generate_minterms(struct ast *a) {
-    ;
+    for(int i = 0; i < (1 << num_vars); i++) {
+        struct minterm *mt = (struct minterm *)malloc(sizeof(struct minterm));
+        mt->n = num_vars;
+        for(int j = 0; j < num_vars; j++) {
+            int is_set = i & (1 << j); // check jth bit
+            int bit = 0;
+            if(is_set) bit = 1;
+            set_node(j, bit);
+            mt->terms[j] = var_names[j];
+            mt->values[j] = bit;
+        }
+        if(eval(a) == 1) {
+            expression[num_minterms] = mt;
+            num_minterms++;
+        } else {
+            free(mt);
+        }
+    }
+}
+
+
+void minterms_to_ascii(void) {
+    FILE *fp = fopen("in.pla", "w+");
+    for(int i = 0; i < num_minterms; i++) {
+        fprintf(fp, "(");
+        for(int j = 0; j < expression[i]->n; j++) {
+            if(expression[i]->values[j] == 0) {
+                fprintf(fp, "!");
+            }
+            fprintf(fp, "%s", expression[i]->terms[j]);
+            if(j != expression[i]->n - 1) {
+                fprintf(fp, "*");
+            }
+        }
+        fprintf(fp, ")");
+        if(i != num_minterms-1) {
+            fprintf(fp, "^");
+        }
+    }
+    fprintf(fp, "\n");
+    fclose(fp);
 }
 
 
