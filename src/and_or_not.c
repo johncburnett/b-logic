@@ -7,6 +7,9 @@
  * Create Commons license: Attribution-ShareAlike 4.0 International
  * (CC BY-SA 4.0)
  * https://creativecommons.org/licenses/by-sa/4.0/
+ *
+ * Main function for generating and_or_not executable. Converts logic expressions
+ * from stdin or file to Sum-of-Products AND-OR-NOT form.
  */
 
 #include <stdio.h>

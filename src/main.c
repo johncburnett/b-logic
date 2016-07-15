@@ -7,6 +7,9 @@
  * Create Commons license: Attribution-ShareAlike 4.0 International
  * (CC BY-SA 4.0)
  * https://creativecommons.org/licenses/by-sa/4.0/
+ *
+ * Functions for the creation of ASTs and the conversion of logic expressions
+ * to Sum-of-Products AND-OR-NOT form and C2 Cannonical AND-XOR form.
  */
 
 #include <stdio.h>
@@ -17,6 +20,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include "main.h"
+
 
 struct ast *new_ast(int nodetype, struct ast *l, struct ast *r) {
     struct ast *a = (struct ast *)malloc(sizeof(struct ast));
@@ -50,34 +54,12 @@ struct ast *new_node(char **d) {
 }
 
 
-void traverse(struct ast *a) {
-    switch(a->nodetype) {
-
-        // two subtrees
-        case '+':
-        case '*':
-        case '^':
-            printf("%c\n", a->nodetype);
-            traverse(a->r);
-
-        // one subtree
-        case '!':
-            traverse(a->l);
-
-        // no subtree
-        case 'K':
-            printf("%s\n", ((struct numval *)a)->s);
-            break;
-        default: printf("internal error: found bad node %c\n", a->nodetype);
-    }
-}
-
-
 int eval(struct ast *a) {
     int v;
 
     switch(a->nodetype) {
         case 'K': v = ((struct numval *)a)->val; break;
+        case '1': v = 1; break;
         case '+': v = eval(a->l) | eval(a->r); break;
         case '*': v = eval(a->l) & eval(a->r); break;
         case '^': v = eval(a->l) ^ eval(a->r); break;
@@ -102,6 +84,7 @@ void free_ast(struct ast *a) {
 
         // no subtree
         case 'K':
+        case '1':
             free(a);
             break;
         default: printf("internal error: free bad node %c\n", a->nodetype);
@@ -285,6 +268,16 @@ void and_xor(struct ast *a) {
         }
     }
 
+    int is_empty = 1;
+    for(int i = 0; i < num_c2_terms; i++) {
+        if(c2_final[i] == 1) {
+            is_empty = 0;
+        }
+    }
+    if(is_empty) {
+        printf("error: not expressable in C2 form");
+    }
+
     FILE *fp = fopen("out.pla", "w+");
     for(int i = 0; i < c2_last_index+1; i++) {
         if(c2_final[i] == 1) {
@@ -309,12 +302,22 @@ void and_xor(struct ast *a) {
 }
 
 
+/*
+ * choose
+ *
+ * helper function for calculating (n choose k)
+ */
 int choose(int n, int k) {
     if(k==0)    return 1;
     else        return (n * choose(n-1, k-1)) / k;
 }
 
 
+/*
+ * combinations
+ *
+ * helper function for determining all n-length combinations of a set
+ */
 void combinations(int s_len, int len, int start, struct indices r, int r_len) {
     if(len == 0) {
         c2_terms[c2_len] = r;
@@ -367,6 +370,11 @@ void reformat_output(void) {
 }
 
 
+/*
+ * generate_minterms
+ *
+ * determines minterms from an AST
+ */
 void generate_minterms(struct ast *a) {
     for(int i = 0; i < (1 << num_vars); i++) {
         struct minterm *mt = (struct minterm *)malloc(sizeof(struct minterm));
@@ -389,6 +397,11 @@ void generate_minterms(struct ast *a) {
 }
 
 
+/*
+ * minterms_to_ascii
+ *
+ * writes minterms in XOR Sum-of-Products form to a file
+ */
 void minterms_to_ascii(void) {
     FILE *fp = fopen("in.pla", "w+");
     for(int i = 0; i < num_minterms; i++) {
@@ -412,6 +425,11 @@ void minterms_to_ascii(void) {
 }
 
 
+/*
+ * print_file
+ *
+ * print the contents of a file
+ */
 void print_file(char **fname) {
     FILE *fp = fopen(*fname, "r");
     int c;
@@ -419,11 +437,6 @@ void print_file(char **fname) {
         putchar(c);
     }
     fclose(fp);
-}
-
-
-void ast_to_string(struct ast *a, char **d) {
-    ;
 }
 
 

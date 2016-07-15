@@ -8,7 +8,7 @@
  * (CC BY-SA 4.0)
  * https://creativecommons.org/licenses/by-sa/4.0/
  *
- * Bison parser for loading digital logic expressions into an AST
+ * Bison parser for loading digital logic expressions into an AST.
  */
 
 %{
@@ -25,6 +25,7 @@
 
 /* tokens */
 %token <s> STRING
+%token <d> ONE
 %token EOL
 %type <a> exp factor term
 
@@ -56,5 +57,6 @@ term: STRING {
 }
 | '!' term { $$ = new_ast('!', $2, NULL); }
 | '(' exp ')' { $$ = $2; }
+| '1' { $$ = new_ast('1', NULL, NULL); }
 ;
 %%

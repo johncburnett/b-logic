@@ -28,6 +28,7 @@ struct ast {
     struct ast *r;
 };
 
+// holds varable name and value of a leaf
 struct numval {
     int nodetype; // type K for constant
     char *s;
@@ -41,18 +42,30 @@ struct minterm {
     int n;
 };
 
-// list of minterms
-struct minterm *expression[100];
-int num_minterms;
+// used to generate c2 terms
+struct indices {
+    int v[100];
+    int n;
+};
 
 // root of AST
 struct ast *root;
 
-// list of tokens
+// list of individual variable names
+char *var_names[100];
+int num_vars;
+
+// array holding pointers to each leaf in AST
 struct numval *tokens[100];
 int num_tokens;
-char *var_names[100]; // list of individual variable names
-int num_vars;
+
+// list of minterms
+struct minterm *expression[100];
+int num_minterms;
+
+// array of possible c2 terms
+struct indices *c2_terms;
+int c2_len;
 
 // AST functions
 struct ast *new_ast(int nodetype, struct ast *l, struct ast *r); // build AST
@@ -73,12 +86,6 @@ void and_or_not(struct ast *);
 
 // C2 AND-XOR form
 void and_xor(struct ast *);
-struct indices {
-    int v[100];
-    int n;
-};
-struct indices *c2_terms;
-int c2_len;
 int choose(int, int);
 void combinations(int, int, int, struct indices, int);
 
@@ -91,8 +98,5 @@ void minterms_to_ascii(void);
 
 // print contents of a file
 void print_file(char **fname);
-
-// convert AST to string
-void ast_to_string(struct ast *, char **);
 
 #endif
