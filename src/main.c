@@ -238,16 +238,21 @@ void and_xor(struct ast *a) {
 
     // search terms and set table
     for(int i = 0; i < num_minterms; i++) {
-        for(int j = 0; j < expression[i]->n; j++) {
-            if(expression[i]->values[j] == 1) {
-                for(int k = 0; k < num_c2_terms; k++) {
-                    for(int l = 0; l < c2_terms[k].n; l++) {
-                        if(j == c2_terms[k].v[l]) {
-                            c2_table[i][k] = 1;
+        for(int j = 0; j < num_c2_terms; j++) {
+            int is_set = 1;
+            for(int k = 0; k < num_vars; k++) {
+                if(expression[i]->values[k] == 1) {
+                    for(int l = 0; l < c2_terms[j].n; l++) {
+                        if(c2_terms[j].v[l] == k) {
+                            break;
+                        }
+                        else if(l == c2_terms[j].n-1) {
+                            is_set = 0;
                         }
                     }
                 }
             }
+            c2_table[i][j] = is_set;
         }
     }
 
@@ -275,7 +280,7 @@ void and_xor(struct ast *a) {
         }
     }
     if(is_empty) {
-        printf("error: not expressable in C2 form");
+        printf("error: input not expressable in C2 form");
     }
 
     FILE *fp = fopen("out.pla", "w+");
